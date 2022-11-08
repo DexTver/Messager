@@ -18,7 +18,7 @@ public class UserApiController {
         return ResponseEntity.ok(users);
     }
 
-    // curl -X POST localhost:8080/users -H "Content-Type: application/json" -d {"name": "Ivan", "age": "17"}
+    // curl -X POST localhost:8080/users -H "Content-Type: application/json" -d '{"name": "Ivan", "age": "17"}'
     @PostMapping("users")
     public ResponseEntity<Void> addUser(
             @RequestBody User user) {
@@ -47,7 +47,7 @@ public class UserApiController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Index out of range");
     }
 
-    // curl -X POST localhost:8080/users/2/create -H "Content-Type: text/plain" -d "18"
+    // curl -X POST localhost:8080/users/0/update_age -H "Content-Type: text/plain" -d "18"
     @PostMapping("users/{index}/update_age")
     public ResponseEntity<String> updateAge(
             @PathVariable("index") Integer index,
