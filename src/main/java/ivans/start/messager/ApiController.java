@@ -29,9 +29,11 @@ public class ApiController {
         return ResponseEntity.ok(prefixMessages);
     }
 
-    // curl -X POST localhost:8080/messages -H "Content-Type: text/plain" -d "ababa"
-    // curl -X POST localhost:8080/messages -H "Content-Type: text/plain" -d "abrba"
-    // curl -X POST localhost:8080/messages -H "Content-Type: text/plain" -d "abaca"
+    /*
+    curl -X POST localhost:8080/messages -H "Content-Type: text/plain" -d "ababa"
+    curl -X POST localhost:8080/messages -H "Content-Type: text/plain" -d "abrba"
+    curl -X POST localhost:8080/messages -H "Content-Type: text/plain" -d "abaca"
+    */
     @PostMapping("messages")
     public ResponseEntity<Void> addMessage(
             @RequestBody String text) {
@@ -43,24 +45,32 @@ public class ApiController {
     @GetMapping("messages/{index}")
     public ResponseEntity<String> getMessage(
             @PathVariable("index") Integer index) {
-        return ResponseEntity.ok(messages.get(index));
+        if (index < messages.size()) {
+            return ResponseEntity.ok(messages.get(index));
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Index out of range");
     }
 
     // curl -X DELETE localhost:8080/messages/0
     @DeleteMapping("messages/{index}")
-    public ResponseEntity<Void> deleteText(
+    public ResponseEntity<String> deleteText(
             @PathVariable("index") Integer index) {
-        messages.remove((int) index);
-        return ResponseEntity.noContent().build();
+        if (index < messages.size()) {
+            messages.remove((int) index);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Index out of range");
     }
 
     // curl -X PUT localhost:8080/messages/0 -H "Content-Type: text/plain" -d "cbcbc"
     @PutMapping("messages/{index}")
     public ResponseEntity<Void> updateMessage(
-            @PathVariable("index") Integer i,
+            @PathVariable("index") Integer index,
             @RequestBody String message) {
-        messages.remove((int) i);
-        messages.add(i, message);
+        if (index < messages.size()) {
+            messages.remove((int) index);
+        }
+        messages.add(index, message);
         return ResponseEntity.accepted().build();
     }
 
@@ -101,10 +111,9 @@ public class ApiController {
             @PathVariable("text") String text) {
         for (int i = 0; i < messages.size(); i++) {
             if (messages.get(i).startsWith(text)) {
-                messages.remove(i);
+                messages.remove((int) i);
             }
         }
         return ResponseEntity.noContent().build();
     }
-
 }
