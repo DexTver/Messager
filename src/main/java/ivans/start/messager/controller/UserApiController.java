@@ -1,5 +1,6 @@
-package ivans.start.messager;
+package ivans.start.messager.controller;
 
+import ivans.start.messager.model.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -18,7 +19,7 @@ public class UserApiController {
         return ResponseEntity.ok(users);
     }
 
-    // curl -X POST localhost:8080/users -H "Content-Type: application/json" -d '{"name": "Ivan", "age": "17"}'
+    // curl -X POST localhost:8080/users -H "Content-Type: application/json" -d '{"name": "Ivan", "age": 17}'
     @PostMapping("users")
     public ResponseEntity<Void> addUser(
             @RequestBody User user) {

@@ -1,21 +1,16 @@
-package ivans.start.messager;
+package ivans.start.messager.model;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class User {
+    @JsonProperty(value = "name", defaultValue = "Anonymous")
     private String name;
+
+    @JsonProperty(value = "age", defaultValue = "18")
     private int age;
 
     public User() {
         age = 21;
-        name = "Anonymous";
-    }
-
-    public User(String name) {
-        age = 21;
-        this.name = name;
-    }
-
-    public User(int age) {
-        this.age = age;
         name = "Anonymous";
     }
 
