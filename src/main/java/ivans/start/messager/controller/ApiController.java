@@ -1,4 +1,4 @@
-package ivans.start.messager;
+package ivans.start.messager.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

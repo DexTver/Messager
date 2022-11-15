@@ -1,4 +1,4 @@
-package ivans.start.messager.controller;
+package ivans.start.messager;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
