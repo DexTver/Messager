@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 @Controller
 @RestController
-public class ApiController {
+public class MessagesApiController {
     private final java.util.List<String> messages = new ArrayList<>();
 
     // curl localhost:8080/messages
@@ -111,7 +111,7 @@ public class ApiController {
             @PathVariable("text") String text) {
         for (int i = 0; i < messages.size(); i++) {
             if (messages.get(i).startsWith(text)) {
-                messages.remove((int) i);
+                messages.remove(i);
             }
         }
         return ResponseEntity.noContent().build();
