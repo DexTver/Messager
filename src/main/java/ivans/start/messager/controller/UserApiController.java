@@ -104,11 +104,14 @@ public class UserApiController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
         }
-        if (direction.equals("down")) {
+        if (direction != null && direction.equals("down")) {
             reverse(users);
         }
         if (age != null) {
             users.removeIf(user -> !(user.getAge() >= age - 5) || (user.getAge() <= age + 5));
+        }
+        if (number == null || limit == null) {
+            return ResponseEntity.ok(users);
         }
         if (number >= 0 && limit > 0) {
             return ResponseEntity.ok(users.stream().skip((long) limit * number).toList().stream().limit(limit).collect(Collectors.toList()));
