@@ -4,6 +4,7 @@ package ivans.start.messager.controller;
 
 import ivans.start.messager.model.User;
 import ivans.start.messager.model.UserEntity;
+import ivans.start.messager.repositories.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -18,34 +19,31 @@ import static java.util.Collections.reverse;
 @RestController
 public class UserApiController {
 
-    int id = 0;
-    private final Map<Integer, User> viewUsers = new HashMap<>();
-    private final Map<Integer, UserEntity> privateUsers = new HashMap<>();
-    private final HashSet<String> uniqueNames = new HashSet<>();
+    private final UserRepository userRepository;
+
+    public UserApiController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     // curl -X POST localhost:8080/users -H "Content-Type: application/json" -d '{"name": "Ivan", "age": 17, "password": "IR01vS", "repeatPassword": "IR01vS"}'
     @PostMapping("users")
     public ResponseEntity<String> addUser(
             @RequestBody UserEntity user) {
-        if (user.getPassword().equals(user.getRepeatPassword()) && !uniqueNames.contains(user.getName())) {
-            privateUsers.put(id, user);
-            viewUsers.put(id, new User(user.getName(), user.getAge()));
-            id++;
-            uniqueNames.add(user.getName());
+        // нужна проверка на наличие такого же имени
+        if (user.getPassword().equals(user.getRepeatPassword())) {
+            userRepository.save(user);
             return ResponseEntity.accepted().build();
         }
-        if (!user.getPassword().equals(user.getRepeatPassword())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Passwords don't equals!");
-        }
-        return ResponseEntity.status(HttpStatus.CONFLICT).body("Name is existed!");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Passwords don't equals!");
     }
 
     // curl localhost:8080/users/1
     @GetMapping("users/{index}")
     public ResponseEntity<String> getUser(
             @PathVariable("index") Integer index) {
-        if (viewUsers.containsKey(index)) {
-            return ResponseEntity.ok(viewUsers.get(index).toString());
+        Optional<UserEntity> userData = userRepository.findById(Long.valueOf(index));
+        if (userData.isPresent()) {
+            return ResponseEntity.ok(userData.toString());
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found!");
     }
@@ -54,31 +52,30 @@ public class UserApiController {
     @DeleteMapping("users/{index}")
     public ResponseEntity<String> deleteUser(
             @PathVariable("index") Integer index) {
-        if (viewUsers.containsKey(index)) {
-            uniqueNames.remove(viewUsers.get(index).getName());
-            viewUsers.remove(index);
-            privateUsers.remove(index);
+        // стоит добавить проверку пароля
+        if (userRepository.findById(Long.valueOf(index)).isPresent()) {
+            userRepository.deleteById(Long.valueOf(index));
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found!");
     }
 
-    // curl -X POST localhost:8080/users/0 -H "Content-Type: application/json" -d '{"name": "Ivan", "age": 17, "password": "krA0bk", "repeatPassword": "krA0bk"}'
-    @PostMapping("users/{index}")
+    // curl -X PUT localhost:8080/users/0 -H "Content-Type: application/json" -d '{"name": "Ivan", "age": 17, "password": "krA0bk", "repeatPassword": "krA0bk"}'
+    @PutMapping("users/{index}")
     public ResponseEntity<String> updateAge(
             @PathVariable("index") Integer index,
             @RequestBody UserEntity user) {
-        if (viewUsers.containsKey(index) && (!uniqueNames.contains(user.getName()) || viewUsers.get(index).getName().equals(user.getName())) && user.getPassword().equals(user.getRepeatPassword())) {
-            uniqueNames.add(user.getName());
-            privateUsers.put(index, user);
-            viewUsers.put(index, new User(user.getName(), user.getAge()));
+        Optional<UserEntity> userData = userRepository.findById(Long.valueOf(index));
+        // нужна проверка на наличие такого же имени
+        if (userData.isPresent() && user.getPassword().equals(user.getRepeatPassword())) {
+            userRepository.save(new UserEntity(Long.valueOf(index), user.getName(), user.getAge(), user.getPassword()));
             return ResponseEntity.accepted().build();
+        }
+        if (userData.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found!");
         }
         if (!user.getPassword().equals(user.getRepeatPassword())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Passwords don't equals!");
-        }
-        if (!viewUsers.containsKey(index)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found!");
         }
         return ResponseEntity.status(HttpStatus.CONFLICT).body("Name is existed!");
     }
@@ -94,7 +91,12 @@ public class UserApiController {
             @RequestParam(value = "direction", required = false) String direction,
             @RequestParam(value = "number", required = false) Integer number,
             @RequestParam(value = "limit", required = false) Integer limit) {
-        List<User> users = new ArrayList<>(viewUsers.values());
+        List<UserEntity> _users = userRepository.findAll();
+        // халява! стоит исправить
+        List<User> users = new ArrayList<>();
+        for (UserEntity userEntity : _users) {
+            users.add(new User(userEntity.getName(), userEntity.getAge()));
+        }
         if (sortBy != null) {
             if (sortBy.equals("name")) {
                 users.sort(Comparator.comparing(User::getName));
