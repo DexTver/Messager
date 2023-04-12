@@ -11,6 +11,11 @@ public class User {
         this.age = age;
     }
 
+    public User(UserEntity user) {
+        this.name = user.getName();
+        this.age = user.getAge();
+    }
+
     public String getName() {
         return name;
     }

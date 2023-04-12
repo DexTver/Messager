@@ -25,14 +25,14 @@ public class UserApiController {
 
     // curl -X POST localhost:8080/users -H "Content-Type: application/json" -d '{"name": "Ivan", "age": 17, "password": "IR01vS", "repeatPassword": "IR01vS"}'
     @PostMapping("users")
-    public ResponseEntity<String> addUser(
+    public ResponseEntity addUser(
             @RequestBody UserEntity user) {
         if (user.getPassword().equals(user.getRepeatPassword()) && !uniqueNames.contains(user.getName())) {
             privateUsers.put(id, user);
             viewUsers.put(id, new User(user.getName(), user.getAge()));
             id++;
             uniqueNames.add(user.getName());
-            return ResponseEntity.accepted().build();
+            return ResponseEntity.ok(new User(user));
         }
         if (!user.getPassword().equals(user.getRepeatPassword())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Passwords don't equals!");

@@ -20,6 +20,9 @@ public class UserEntity {
         this.age = age;
     }
 
+    public UserEntity() {
+    }
+
     public String getName() {
         return name;
     }
