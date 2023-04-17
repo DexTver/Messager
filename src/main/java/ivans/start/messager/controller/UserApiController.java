@@ -31,14 +31,14 @@ public class UserApiController {
 
     // curl -X POST localhost:8080/users -H "Content-Type: application/json" -d '{"name": "Ivan", "age": 17, "password": "IR01vS", "repeatPassword": "IR01vS"}'
     @PostMapping("users")
-    public ResponseEntity<String> addUser(
+    public ResponseEntity addUser(
             @RequestBody UserEntity user) {
         String _name = user.getName();
         Optional<Name> nameData = nameRepository.findByName(_name);
         if (user.getPassword().equals(user.getRepeatPassword()) && (nameData.isPresent() ? !nameData.get().isIs_existed() : true)) {
             userRepository.save(user);
             nameRepository.save(new Name(_name, true));
-            return ResponseEntity.accepted().build();
+            return ResponseEntity.ok(new User(user));
         }
         if (!user.getPassword().equals(user.getRepeatPassword())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Passwords don't equals!");
