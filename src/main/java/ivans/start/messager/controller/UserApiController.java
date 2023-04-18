@@ -59,17 +59,41 @@ public class UserApiController {
 
     // curl -X DELETE localhost:8080/users/0 123123
     @DeleteMapping("users/{index}")
-    public ResponseEntity<String> deleteUser(
+    public ResponseEntity<String> deleteTheUser(
             @PathVariable("index") Integer index,
             @RequestBody String password) {
-        if (userRepository.findById(Long.valueOf(index)).isPresent()) {
-            if (!Objects.equals(userRepository.findById(Long.valueOf(index)).get().getPassword(), password)) {
+        Long _id = Long.valueOf(index);
+        if (userRepository.findById(_id).isPresent()) {
+            String _name = userRepository.findById(_id).get().getName();
+            if (!Objects.equals(userRepository.findById(_id).get().getPassword(), password)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid password!");
             }
-            userRepository.deleteById(Long.valueOf(index));
+            userRepository.deleteById(_id);
+            nameRepository.deleteById(_name);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found!");
+    }
+
+    @DeleteMapping("users")
+    public ResponseEntity<String> deleteUser(
+            @RequestBody UserEntity user) {
+        String _name = user.getName();
+        Optional<UserEntity> userData = userRepository.findByName(_name);
+        if (userData.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found!");
+        }
+        String myPassword = userData.get().getPassword();
+        String theirPassword = user.getPassword(), theirRepeatPassword = user.getRepeatPassword();
+        if (theirRepeatPassword.equals("") || theirRepeatPassword.equals(theirPassword)) {
+            if (myPassword.equals(theirPassword)) {
+                userRepository.deleteById(userRepository.findByName(_name).get().getId());
+                nameRepository.deleteById(_name);
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid password!");
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Passwords don't equals!");
     }
 
     // curl -X PUT localhost:8080/users/0 -H "Content-Type: application/json" -d '{"name": "Ivan", "age": 17, "password": "krA0bk", "repeatPassword": "krA0bk"}'

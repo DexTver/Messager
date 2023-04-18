@@ -1,5 +1,4 @@
 function userList() {
-    // Call Web API to get a list of user
     $.ajax({
         url: 'http://localhost:8080/users',
         type: 'GET',
@@ -14,19 +13,15 @@ function userList() {
 }
 
 function userListSuccess(users) {
-    // Iterate over the collection of data
     $.each(users, function (index, user) {
-        // Add a row to the user table
         userAddRow(user);
     });
 }
 
 function userAddRow(user) {
-    // Check if <tbody> tag exists, add one if not
     if ($("#userTable tbody").length == 0) {
         $("#userTable").append("<tbody></tbody>");
     }
-    // Append row to <table>
     $("#userTable tbody").append(
         userBuildTableRow(user));
 }
@@ -61,7 +56,6 @@ function formClear() {
 }
 
 function updateClick() {
-    // Build user object from inputs
     const User = {};
     User.name = $("#name").val();
     User.age = $("#age").val();
@@ -89,4 +83,30 @@ function userAdd(user) {
 function userAddSuccess(user) {
     userAddRow(user);
     formClear();
+}
+
+function deleteClick() {
+    const User = {};
+    User.name = $("#name").val();
+    User.age = $("#age").val();
+    User.password = $("#password").val();
+    User.repeatPassword = $("#repeatPassword").val();
+    userDelete(User);
+}
+
+function userDelete(user) {
+    $.ajax({
+        url: "http://localhost:8080/users",
+        type: 'DELETE',
+        contentType:
+            "application/json;charset=utf-8",
+        data: JSON.stringify(user),
+        success: function (_user) {
+            tableClear();
+            userList();
+        },
+        error: function (request, message, error) {
+            handleException(request, message, error);
+        }
+    });
 }

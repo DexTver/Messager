@@ -11,7 +11,7 @@ public class Name {
     @Id
     @Column(name = "name")
     private String name;
-    @Column(name = "age")
+    @Column(name = "is_existed")
     private boolean is_existed;
 
     public Name(String name, boolean is_existed) {
