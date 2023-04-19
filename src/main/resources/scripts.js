@@ -16,6 +16,8 @@ function userListSuccess(users) {
     $.each(users, function (index, user) {
         userAddRow(user);
     });
+    clearMessage();
+    addRowHandlers();
 }
 
 function userAddRow(user) {
@@ -39,13 +41,14 @@ function tableClear() {
 
 function handleException(request, message, error) {
     let msg = "";
-    msg += "Code: " + request.status + "\n";
-    msg += "Text: " + request.responseText + "\n";
+    // msg += "Code: " + request.status + "\n";
+    msg += request.responseText + "\n";
     console.log(request);
     if (request.responseJSON != null) {
         msg += "Message" + request.responseJSON.Message + "\n";
     }
-    alert(msg);
+    addMessage(msg);
+    setTimeout(clearMessage, 5000);
 }
 
 function formClear() {
@@ -82,6 +85,8 @@ function userAdd(user) {
 
 function userAddSuccess(user) {
     userAddRow(user);
+    clearMessage();
+    addRowHandlers();
     formClear();
 }
 
@@ -109,4 +114,30 @@ function userDelete(user) {
             handleException(request, message, error);
         }
     });
+}
+
+function addRowHandlers() {
+    var table = document.getElementById("userTable");
+    var rows = table.getElementsByTagName("tr");
+    for (i = 0; i < rows.length; i++) {
+        var currentRow = table.rows[i];
+        var createClickHandler = function (row) {
+            return function () {
+                var cell = row.getElementsByTagName("td");
+                var name = cell[0].innerHTML;
+                var age = cell[1].innerHTML;
+                $("#name").val(name);
+                $("#age").val(age);
+            };
+        };
+        currentRow.onclick = createClickHandler(currentRow);
+    }
+}
+
+function addMessage(text) {
+    document.getElementById('info').innerHTML = text;
+}
+
+function clearMessage() {
+    document.getElementById('info').innerHTML = "";
 }

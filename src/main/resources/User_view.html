@@ -11,7 +11,7 @@ ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
     </script>
     <script src="scripts.js"></script>
 </head>
-<body>
+<body style="padding: 20px">
 <div class="row">
     <div class="col-sm-6">
         <table id="userTable"
@@ -56,7 +56,7 @@ ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
     <input type="password" id="repeatPassword" class="form-control"/>
 </div>
 <div class="row">
-    <div class="col-xs-12">
+    <div class="col-xs-12" style="margin-left: 15px">
         <button type="button"
                 id="updateButton"
                 class="btn btn-primary"
@@ -64,7 +64,8 @@ ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
             Add
         </button>
     </div>
-        <div class="col-xs-12">
+    <div style="width: 20px"></div>
+    <div class="col-xs-12">
         <button type="button"
                 id="deleteButton"
                 class="btn btn-primary"
@@ -74,10 +75,16 @@ ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
         </button>
     </div>
 </div>
+<div class="messages" style="margin-top: 10px; font-size: 20px">
+    <div>
+        <label id="info"></label>
+    </div>
+</div>
 </body>
 </html>
 <script>
     $(document).ready(function () {
         userList();
+        addRowHandlers();
     });
 </script>
